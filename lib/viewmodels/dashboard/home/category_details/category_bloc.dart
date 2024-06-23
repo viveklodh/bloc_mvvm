@@ -1,9 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_bloc_mvvm_example/models/dashboard/home/categories/categories_model.dart';
 import 'package:flutter_bloc_mvvm_example/viewmodels/dashboard/home/category_details/category_event.dart';
 import 'package:flutter_bloc_mvvm_example/viewmodels/dashboard/home/category_details/category_state.dart';
-import 'package:flutter_bloc_mvvm_example/viewmodels/dashboard/home/home_event.dart';
-import 'package:flutter_bloc_mvvm_example/viewmodels/dashboard/home/home_state.dart';
+
 
 class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
 

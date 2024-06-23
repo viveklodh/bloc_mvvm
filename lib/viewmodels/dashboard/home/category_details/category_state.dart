@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_bloc_mvvm_example/models/dashboard/home/categories/categories_model.dart';
 
 abstract class CategoryState extends Equatable {
   const CategoryState();
