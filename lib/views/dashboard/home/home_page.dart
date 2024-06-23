@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> {
           crossAxisCount: 2,
           crossAxisSpacing: 20,
           mainAxisSpacing: 20,
-          mainAxisExtent: 180,
+          mainAxisExtent: 200,
         ),
         itemCount: model.listOfCards?.length,
         itemBuilder: (context, index) {

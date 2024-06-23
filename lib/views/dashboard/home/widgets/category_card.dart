@@ -36,7 +36,7 @@ class CategoryCard extends StatelessWidget {
 
  Widget _cardLabel() {
     return  Padding(
-      padding: const EdgeInsets.only(left: 10.0, top: 10.0),
+      padding: const EdgeInsets.only(left: 10.0, top: 8.0),
       child: Text(
         categoriesCardModel.label ?? "",
         style: TextStyle(
@@ -49,7 +49,7 @@ class CategoryCard extends StatelessWidget {
 
  Widget _cardElementsCount() {
     return  Padding(
-      padding: const EdgeInsets.only(left: 10.0, top: 10.0),
+      padding: const EdgeInsets.only(left: 10.0, top: 8.0),
       child: Text(
         '(${categoriesCardModel.totalItems})',
         style: TextStyle(
