@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc_mvvm_example/core/utils/app_colors.dart';
 import 'package:flutter_bloc_mvvm_example/core/utils/app_image_path.dart';
 import 'package:flutter_bloc_mvvm_example/core/utils/dimens.dart';
 import 'package:flutter_bloc_mvvm_example/models/dashboard/home/categories/categories_model.dart';
+import 'package:flutter_bloc_mvvm_example/viewmodels/dashboard/home/category_details/category_bloc.dart';
+import 'package:flutter_bloc_mvvm_example/viewmodels/dashboard/home/category_details/category_event.dart';
+import 'package:flutter_bloc_mvvm_example/viewmodels/dashboard/home/category_details/category_state.dart';
 import 'package:flutter_bloc_mvvm_example/views/dashboard/widgets/custom_app_bar.dart';
 import 'package:flutter_bloc_mvvm_example/widgets/app_bottom_nav_bar.dart';
 import 'package:flutter_bloc_mvvm_example/widgets/app_text_field.dart';
@@ -17,47 +21,64 @@ class CategoryDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppColors.appBackGroundColor,
-        body: Stack(
-          children: [
-            Align(
-                alignment: Alignment.topRight,
-                child: Image.asset(AppImagePath.greenTree,
-                    height: 140, width: 140)),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  //
-                  SizedBox(height: Dimens.height20),
-                  //
-                  const CustomAppBar(),
-                  //
-                  SizedBox(height: Dimens.height16),
-                  //
-                  _pageTitle(),
-                  //
-                  SizedBox(height: Dimens.height16),
-                  //
-                  const AppTextField(),
-                  //
-                  SizedBox(height: Dimens.height20),
-                  //
-                  _chipsWidget(),
-                  //
-                  SizedBox(height: Dimens.height20),
-                  //
-                  _itemsListView(model),
-                  //
+      child: BlocProvider<CategoryBloc>(
+          create: (_) => CategoryBloc(),
+        child: Scaffold(
+          backgroundColor: AppColors.appBackGroundColor,
+          body: Stack(
+            children: [
+              Align(
+                  alignment: Alignment.topRight,
+                  child: Image.asset(AppImagePath.greenTree,
+                      height: 140, width: 140)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    //
+                    SizedBox(height: Dimens.height20),
+                    //
+                    const CustomAppBar(),
+                    //
+                    SizedBox(height: Dimens.height16),
+                    //
+                    _pageTitle(),
+                    //
+                    SizedBox(height: Dimens.height16),
+                    //
+                    const AppTextField(),
+                    //
+                    SizedBox(height: Dimens.height20),
+                    //
+                    BlocBuilder<CategoryBloc, CategoryState>(
+                      builder: (context, state) {
+                        if (state is ChipInitialState) {
+                          return _chipsWidget(0,context);
+                        } else if (state is ChipLoadingState) {
+                          return _buildLoading();
+                        } else if (state is ChipLoadedState) {
+                          return _chipsWidget(state.selectedIndex,context);
+                        } else if (state is ChipErrorState) {
+                          return Container();
+                        } else {
+                          return Container();
+                        }
+                      },
+                    ),
+                    //
+                    SizedBox(height: Dimens.height20),
+                    //
+                    _itemsListView(model),
+                    //
 
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
+          bottomNavigationBar: const AppBottomNavBar(),
         ),
-        bottomNavigationBar: const AppBottomNavBar(),
       ),
     );
   }
@@ -111,34 +132,42 @@ class CategoryDetailsPage extends StatelessWidget {
             }));
   }
 
-  Widget _chipsWidget() {
+  Widget _buildLoading() => const Center(child: CircularProgressIndicator());
+
+
+  Widget _chipsWidget(int selectedIndex,BuildContext context) {
     var listOfChip = ["Cabbage and lettuce (14)","Potatoes (10)","Onions and garlic (8)","Peppers (7)","Cabbage and lettuce (14)","Onions and garlic (8)","Peppers (7)","Potatoes (10)"];
     return Wrap(
       children: [
        ...List.generate(6, (index){
-          return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 4),
-              margin: const EdgeInsets.symmetric(horizontal: 4,vertical: 4),
-              decoration: ShapeDecoration(
-                color: index ==0?Colors.deepPurple.shade100: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-              ),
-              child:  Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                 index==0? Icon(Icons.done,size: 14,color: AppColors.appColor):SizedBox(),
-                  Text(
-                    listOfChip[index],
-                    style: TextStyle(
-                      color: index==0?AppColors.appColor: AppColors.grey,
-                      fontSize: Dimens.fontSize12,
-                      fontWeight: FontWeight.w400,
-                    ),
+          return GestureDetector(
+            onTap: (){
+              BlocProvider.of<CategoryBloc>(context).add(SelectChipEvent(index));
+            },
+            child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 4),
+                margin: const EdgeInsets.symmetric(horizontal: 4,vertical: 4),
+                decoration: ShapeDecoration(
+                  color: index == selectedIndex?Colors.deepPurple.shade100: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
-                ],
-              )
+                ),
+                child:  Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                   index==selectedIndex? Icon(Icons.done,size: Dimens.fontSize12,color: AppColors.appColor):const SizedBox(),
+                    Text(
+                      listOfChip[index],
+                      style: TextStyle(
+                        color: index==selectedIndex?AppColors.appColor: AppColors.grey,
+                        fontSize: Dimens.fontSize12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                )
+            ),
           );
         })
       ],
